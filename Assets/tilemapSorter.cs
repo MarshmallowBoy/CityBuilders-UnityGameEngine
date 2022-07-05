@@ -168,14 +168,17 @@ public class tilemapSorter : NetworkBehaviour
         {
             WantHelp.SetActive(false);
         }
+
+        /* TODO not make this crap on the server.
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
+            
             Save();
         }
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
             Load();
-        }
+        }*/
     }
 
     [Command]
