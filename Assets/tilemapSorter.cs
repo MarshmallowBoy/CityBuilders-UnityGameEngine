@@ -27,13 +27,14 @@ public class tilemapSorter : NetworkBehaviour
     int ExistingComplex = 0;
     int tileID = 6;
     int ExistingFarms = 0;
+    public tempPrefs tempPrefs1;
 
     public GameObject cam2;
 
     public GameObject WantHelp;
 
     public GameObject Bombfire;
-
+    
     private void Start()
     {
         grid = GameObject.Find("Grid").GetComponent<Grid>();
@@ -45,6 +46,9 @@ public class tilemapSorter : NetworkBehaviour
         //Load();
         if (!isLocalPlayer)
             cam.gameObject.SetActive(false);
+        GameObject MyManager1 = GameObject.Find("NetworkManager");
+        tempPrefs1 = MyManager1.GetComponent<tempPrefs>();
+        
     }
 
     void Update()
@@ -75,7 +79,7 @@ public class tilemapSorter : NetworkBehaviour
                 ActiveTile--;
             }
         }
-        UIMoney.text = "Money: " + Money;
+        UIMoney.text = "" + Money;
         if (Time.time > nextTimeToFire)
         {
             nextTimeToFire = Time.time + 10f;
@@ -106,6 +110,29 @@ public class tilemapSorter : NetworkBehaviour
             }
 
             if (default1.GetTile(mousePos) != tile[6]) { return; }
+
+            if (tempPrefs1.sandbox)
+            {
+                
+                if (ActiveTile == 0)
+                {
+                    ExistingHaus++;
+                }
+                if (ActiveTile == 5)
+                {
+                    ExistingComplex++;
+                }
+                if (ActiveTile == 7)
+                {
+                    ExistingFarms++;
+                }
+                if (ActiveTile == 8)
+                {
+                    StartCoroutine(SpawnFire(mousePos));
+                }
+                SendData(ActiveTile, mousePos, 0);
+                return;
+            }
 
             if (ActiveTile == 0)
                 if (CheckHaus(mousePos) == false || Money < HausCost || ExistingFarms/2 < ExistingHaus + 1) { return; } else {
@@ -171,8 +198,7 @@ public class tilemapSorter : NetworkBehaviour
 
         /* TODO not make this crap on the server.
         if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            
+        {   
             Save();
         }
         if (Input.GetKeyDown(KeyCode.Alpha9))

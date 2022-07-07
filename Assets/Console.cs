@@ -10,7 +10,7 @@ public class Console : MonoBehaviour
     public InputField input1;
     public AudioSource Music;
     bool Tilde = false;
-    bool HelpSheet = false;
+    bool HelpSheet = true;
     bool Image1 = false;
     void Update()
     {
