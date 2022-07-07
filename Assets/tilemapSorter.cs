@@ -17,7 +17,7 @@ public class tilemapSorter : NetworkBehaviour
     int lastActiveTile = 0;
     public Text UIMoney;
     public float Money;
-    public float nextTimeToFire = 0f;
+    public float nextTimeToFire = 10f;
     int ExistingHaus = 0;
     public bool Eraser = false;
     public float HausCost;
@@ -27,14 +27,13 @@ public class tilemapSorter : NetworkBehaviour
     int ExistingComplex = 0;
     int tileID = 6;
     int ExistingFarms = 0;
-    public tempPrefs tempPrefs1;
 
     public GameObject cam2;
 
     public GameObject WantHelp;
 
     public GameObject Bombfire;
-    
+
     private void Start()
     {
         grid = GameObject.Find("Grid").GetComponent<Grid>();
@@ -42,12 +41,19 @@ public class tilemapSorter : NetworkBehaviour
         default2 = GameObject.Find("Tilemap3").GetComponent<Tilemap>();
         cam2 = GameObject.Find("cam2");
         cam2.SetActive(false);
-        //Save();
-        //Load();
         if (!isLocalPlayer)
             cam.gameObject.SetActive(false);
         GameObject MyManager1 = GameObject.Find("NetworkManager");
-        tempPrefs1 = MyManager1.GetComponent<tempPrefs>();
+        nextTimeToFire = Time.time + 10f;
+
+        if (PlayerPrefs.GetFloat("Post") == 0)
+        {
+            GameObject.Find("Global Volume").SetActive(false);
+        }
+        if(PlayerPrefs.GetFloat("Post") == 1)
+        {
+            GameObject.Find("Global Volume").SetActive(true);
+        }
         
     }
 
@@ -85,8 +91,6 @@ public class tilemapSorter : NetworkBehaviour
             nextTimeToFire = Time.time + 10f;
             Money += ExistingHaus * 100;
             Money += ExistingComplex * 200;
-            //Save();
-            //Load();
             Refresh();
         }
         Vector3Int mousePos = GetMousePos();
@@ -111,9 +115,8 @@ public class tilemapSorter : NetworkBehaviour
 
             if (default1.GetTile(mousePos) != tile[6]) { return; }
 
-            if (tempPrefs1.sandbox)
+            if (PlayerPrefs.GetInt("sandbox") == 1)
             {
-                
                 if (ActiveTile == 0)
                 {
                     ExistingHaus++;
@@ -195,16 +198,6 @@ public class tilemapSorter : NetworkBehaviour
         {
             WantHelp.SetActive(false);
         }
-
-        /* TODO not make this crap on the server.
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {   
-            Save();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha9))
-        {
-            Load();
-        }*/
     }
 
     [Command]
@@ -295,7 +288,8 @@ public class tilemapSorter : NetworkBehaviour
         {
             return;
         }
-        StreamWriter sw = new StreamWriter(@"C:\tmp\text.txt");
+        StreamWriter sw = new StreamWriter(Application.persistentDataPath + "/save.txt");
+        sw.AutoFlush = true;
         for (int k = -24; k < 25; k++)
         {
             for (int i = -31; i < 32; i++)
@@ -316,7 +310,7 @@ public class tilemapSorter : NetworkBehaviour
     [Command]
     public void Load()
     {
-        StreamReader sr = new StreamReader(@"C:\tmp\text.txt");
+        StreamReader sr = new StreamReader(Application.persistentDataPath + "/save.txt");
         for (int k = -24; k < 25; k++)
         {
             for (int i = -31; i < 32; i++)
@@ -467,5 +461,4 @@ public class tilemapSorter : NetworkBehaviour
         Fire.transform.localScale = new Vector3(5, 5, 5);
         NetworkServer.Spawn(Fire);
     }
-
 }
