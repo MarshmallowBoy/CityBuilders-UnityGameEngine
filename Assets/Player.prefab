@@ -362,7 +362,6 @@ MonoBehaviour:
   GetCash: {fileID: 563250996379768358}
   Purchase: {fileID: 563250997705585858}
   ComplexCost: 20000
-  tempPrefs1: {fileID: 0}
   cam2: {fileID: 0}
   WantHelp: {fileID: 8597210430213906611}
   Bombfire: {fileID: 1368903030998156659, guid: 61797985ad1065a42a963195b8ccbfee, type: 3}
@@ -3610,10 +3609,15 @@ MonoBehaviour:
   Manager1: {fileID: 0}
   Check: {fileID: 0}
   secretobject: {fileID: 0}
+  LoadSign: {fileID: 8469556699748768599}
+  Post1: {fileID: 0}
+  value1: 0
   MainMenu: {fileID: 0}
   PlayMenu: {fileID: 0}
   SinglePlayerMenu: {fileID: 0}
   MultiPlayerMenu: {fileID: 0}
+  SettingsMenu: {fileID: 0}
+  HostingMenu: {fileID: 0}
 --- !u!1 &6062610729572197562
 GameObject:
   m_ObjectHideFlags: 0

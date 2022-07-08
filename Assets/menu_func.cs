@@ -10,6 +10,7 @@ public class menu_func : MonoBehaviour
 
     public GameObject Check;
     public GameObject secretobject;
+    public GameObject LoadSign;
     public Slider Post1;
     bool secretbool;
     bool Clicked = false;
@@ -20,15 +21,34 @@ public class menu_func : MonoBehaviour
     public GameObject SinglePlayerMenu;
     public GameObject MultiPlayerMenu;
     public GameObject SettingsMenu;
+    public GameObject HostingMenu;
 
     public void Start()
     {
         Manager1 = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        if (Post1 != null)
+        {
+            PlayerPrefs.SetInt("sandbox", 0);
+        }
+        
         if (PlayerPrefs.GetInt("LoadLastSave") == 1)
         {
             Clicked = true;
             if(Check != null)
             Check.SetActive(true);
+        }
+
+        if (LoadSign == null)
+        {
+            return;
+        }
+        if (PlayerPrefs.GetInt("Multiplayer") == 1)
+        {
+            LoadSign.SetActive(false);
+        }
+        if (PlayerPrefs.GetInt("Multiplayer") == 0)
+        {
+            LoadSign.SetActive(true);
         }
     }
 
@@ -39,23 +59,21 @@ public class menu_func : MonoBehaviour
             return;
         }
         value1 = Post1.value;
-        if(value1 == 1){
+        if (PlayerPrefs.GetFloat("Post") == 1)
+        {
+            Post1.value = 1;
+        }
+        if (PlayerPrefs.GetFloat("Post") == 0)
+        {
+            Post1.value = 0;
+        }
+        if (value1 == 1){
             PlayerPrefs.SetFloat("Post", 1);
         }
         else
         {
             PlayerPrefs.SetFloat("Post", 0);
         }
-
-        if (PlayerPrefs.GetFloat("Post") == 1)
-        {
-            Post1.value = 1;
-        }
-        if(PlayerPrefs.GetFloat("Post") == 0)
-        {
-            Post1.value = 0;
-        }
-        
     }
 
     public void secret()
@@ -78,6 +96,7 @@ public class menu_func : MonoBehaviour
         SinglePlayerMenu.SetActive(false);
         MultiPlayerMenu.SetActive(false);
         SettingsMenu.SetActive(false);
+        HostingMenu.SetActive(false);
     }
 
     public void OpenMainMenu()
@@ -87,6 +106,7 @@ public class menu_func : MonoBehaviour
         SinglePlayerMenu.SetActive(false);
         MultiPlayerMenu.SetActive(false);
         SettingsMenu.SetActive(false);
+        HostingMenu.SetActive(false);
     }
 
     public void OpenSinglePlayerMenu()
@@ -96,6 +116,7 @@ public class menu_func : MonoBehaviour
         SinglePlayerMenu.SetActive(true);
         MultiPlayerMenu.SetActive(false);
         SettingsMenu.SetActive(false);
+        HostingMenu.SetActive(false);
     }
     public void OpenMultiPlayerMenu()
     {
@@ -104,6 +125,7 @@ public class menu_func : MonoBehaviour
         SinglePlayerMenu.SetActive(false);
         MultiPlayerMenu.SetActive(true);
         SettingsMenu.SetActive(false);
+        HostingMenu.SetActive(false);
     }
 
     public void OpenSettingsMenu()
@@ -113,8 +135,17 @@ public class menu_func : MonoBehaviour
         SinglePlayerMenu.SetActive(false);
         MultiPlayerMenu.SetActive(false);
         SettingsMenu.SetActive(true);
+        HostingMenu.SetActive(false);
     }
-
+    public void OpenHostingMenu()
+    {
+        MainMenu.SetActive(false);
+        PlayMenu.SetActive(false);
+        SinglePlayerMenu.SetActive(false);
+        MultiPlayerMenu.SetActive(false);
+        SettingsMenu.SetActive(false);
+        HostingMenu.SetActive(true);
+    }
 
     public void QuitGame()
     {
@@ -127,18 +158,22 @@ public class menu_func : MonoBehaviour
     }
     public void Play_Normal()
     {
+        PlayerPrefs.SetInt("Multiplayer", 0);
         Manager1.StartHost();
         gameObject.SetActive(false);
     }
 
     public void JoinGame()
     {
+        PlayerPrefs.SetInt("Multiplayer", 1);
+        gameObject.SetActive(false);
         Manager1.StartClient();
     }
 
     public void Host()
     {
-        Manager1.StartHost();
+        OpenHostingMenu();
+        Manager1.StartServer();
     }
 
     public void StopEverything(){
@@ -150,6 +185,7 @@ public class menu_func : MonoBehaviour
         else if (NetworkClient.isConnected)
         {
             Manager1.StopClient();
+            SceneManager.LoadScene(0);
         }
         // stop server if server-only
         else if (NetworkServer.active)

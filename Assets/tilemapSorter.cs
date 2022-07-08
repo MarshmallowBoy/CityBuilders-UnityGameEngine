@@ -288,7 +288,8 @@ public class tilemapSorter : NetworkBehaviour
         {
             return;
         }
-        StreamWriter sw = new StreamWriter(Application.persistentDataPath + "/save.txt");
+        Directory.CreateDirectory(Application.persistentDataPath + "/maps");        
+        StreamWriter sw = new StreamWriter(Application.persistentDataPath + "/maps/save.cmf");
         sw.AutoFlush = true;
         for (int k = -24; k < 25; k++)
         {
@@ -310,7 +311,7 @@ public class tilemapSorter : NetworkBehaviour
     [Command]
     public void Load()
     {
-        StreamReader sr = new StreamReader(Application.persistentDataPath + "/save.txt");
+        StreamReader sr = new StreamReader(Application.persistentDataPath + "/maps/save.cmf");
         for (int k = -24; k < 25; k++)
         {
             for (int i = -31; i < 32; i++)
