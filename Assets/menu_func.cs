@@ -221,4 +221,9 @@ public class menu_func : MonoBehaviour
     {
         PlayerPrefs.SetInt("Post", value);
     }
+
+    public void SetName(string Name)
+    {
+        PlayerPrefs.SetString("name", Name);
+    }
 }

@@ -34,6 +34,9 @@ public class tilemapSorter : NetworkBehaviour
 
     public GameObject Bombfire;
 
+    public GameObject MoneyCollector;
+
+    public GameObject MoneyCollectorComp;
     private void Start()
     {
         grid = GameObject.Find("Grid").GetComponent<Grid>();
@@ -89,14 +92,47 @@ public class tilemapSorter : NetworkBehaviour
         if (Time.time > nextTimeToFire)
         {
             nextTimeToFire = Time.time + 10f;
-            Money += ExistingHaus * 100;
-            Money += ExistingComplex * 200;
+            //Money += ExistingHaus * 100;
+            //Money += ExistingComplex * 200;
+            if(isServer || isServerOnly)
             Refresh();
         }
         Vector3Int mousePos = GetMousePos();
         CheckTileSelection();
         if (Input.GetMouseButtonDown(0))
         {
+            
+            RaycastHit2D _hit = Physics2D.Raycast(gameObject.GetComponentInChildren<Camera>().ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            if (_hit.collider != null)
+            {
+                if (_hit.transform.CompareTag("HausCollection") && _hit.transform.gameObject.GetComponent<SpriteRenderer>().enabled == true)
+                {
+                    Money += 100;
+                    StartCoroutine(_hit.transform.gameObject.GetComponent<MoneyCollection>().cycle());
+                }
+                else if(_hit.transform.gameObject.GetComponent<SpriteRenderer>().enabled == true)
+                {
+                    Money += 200;
+                    StartCoroutine(_hit.transform.gameObject.GetComponent<MoneyCollection>().cycle());
+                }
+                if (ActiveTile == 6)
+                {
+                    if (_hit.transform.CompareTag("HausCollection"))
+                    {
+                        ExistingHaus--;
+                    }
+                    else
+                    {
+                        ExistingComplex--;
+                    }
+                    Destroy(_hit.transform.gameObject);
+                    SendData(6, mousePos, 0);
+                    return;
+                }
+                _hit.transform.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+                
+
+            }
 
             WantHelp.SetActive(false);
             if (Eraser == true)
@@ -137,12 +173,15 @@ public class tilemapSorter : NetworkBehaviour
                 return;
             }
 
+            
+
             if (ActiveTile == 0)
                 if (CheckHaus(mousePos) == false || Money < HausCost || ExistingFarms/2 < ExistingHaus + 1) { return; } else {
                     ExistingHaus++;
                     Money -= HausCost;
                     Purchase.PlayOneShot(Purchase.clip);
                     SendData(0, mousePos, 0);
+                    Instantiate(MoneyCollector, mousePos + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
                     return;
                 }
 
@@ -153,6 +192,7 @@ public class tilemapSorter : NetworkBehaviour
                     Money -= ComplexCost;
                     Purchase.PlayOneShot(Purchase.clip);
                     SendData(5, mousePos, 0);
+                    Instantiate(MoneyCollectorComp, mousePos + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
                     return;
                 }
 
@@ -388,6 +428,7 @@ public class tilemapSorter : NetworkBehaviour
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
+            //Eraser (no crap)
             Eraser = !Eraser;
             if (Eraser) { lastActiveTile = ActiveTile; }
             if (Eraser == false)
@@ -397,6 +438,7 @@ public class tilemapSorter : NetworkBehaviour
             }
             ActiveTile = 6;
         }
+        //more eraser stuff
         if (ActiveTile != 6)
         {
             Eraser = false;
@@ -405,6 +447,7 @@ public class tilemapSorter : NetworkBehaviour
         {
             Eraser = true;
         }
+
         if (Input.GetKeyDown(KeyCode.Alpha7))
         {
             //Farm

@@ -3,7 +3,18 @@ guid: ad4e47c79405f5047be12f5f2f7fedbd
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - grid: {instanceID: 0}
+  - default1: {instanceID: 0}
+  - default2: {instanceID: 0}
+  - cam: {instanceID: 0}
+  - UIMoney: {instanceID: 0}
+  - GetCash: {instanceID: 0}
+  - Purchase: {instanceID: 0}
+  - cam2: {instanceID: 0}
+  - WantHelp: {instanceID: 0}
+  - Bombfire: {instanceID: 0}
+  - MoneyCollector: {fileID: 1825311313448935858, guid: a0995b29761a745409fa6856bc52d4c8, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
