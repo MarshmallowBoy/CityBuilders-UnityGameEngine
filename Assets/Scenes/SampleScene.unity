@@ -40127,7 +40127,7 @@ MonoBehaviour:
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
-  m_OverlapOperation: 0
+  m_OverlapOperation: 1
   m_NormalMapDistance: 3
   m_NormalMapQuality: 2
   m_UseNormalMap: 0
@@ -71868,7 +71868,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Ver.0.1.5
+  m_Text: Ver.0.1.6
 --- !u!222 &916769458
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -27,6 +27,7 @@ public class tilemapSorter : NetworkBehaviour
     int ExistingComplex = 0;
     int tileID = 6;
     int ExistingFarms = 0;
+    bool canCollect = false;
 
     public GameObject cam2;
 
@@ -37,6 +38,10 @@ public class tilemapSorter : NetworkBehaviour
     public GameObject MoneyCollector;
 
     public GameObject MoneyCollectorComp;
+
+    public GameObject MoneyCollectorTax;
+
+    public GameObject glowstone;
     private void Start()
     {
         grid = GameObject.Find("Grid").GetComponent<Grid>();
@@ -110,10 +115,15 @@ public class tilemapSorter : NetworkBehaviour
                     Money += 100;
                     StartCoroutine(_hit.transform.gameObject.GetComponent<MoneyCollection>().cycle());
                 }
-                else if(_hit.transform.gameObject.GetComponent<SpriteRenderer>().enabled == true)
+                if(_hit.transform.CompareTag("CompCollection") && _hit.transform.gameObject.GetComponent<SpriteRenderer>().enabled == true)
                 {
                     Money += 200;
                     StartCoroutine(_hit.transform.gameObject.GetComponent<MoneyCollection>().cycle());
+                }
+                if (_hit.transform.CompareTag("TaxCollection") && _hit.transform.gameObject.GetComponent<SpriteRenderer>().enabled == true)
+                {
+                    StartCoroutine(_hit.transform.gameObject.GetComponent<MoneyCollection>().cycle());
+                    canCollect = true;
                 }
                 if (ActiveTile == 6)
                 {
@@ -121,7 +131,7 @@ public class tilemapSorter : NetworkBehaviour
                     {
                         ExistingHaus--;
                     }
-                    else
+                    if(_hit.transform.CompareTag("CompCollection"))
                     {
                         ExistingComplex--;
                     }
@@ -132,6 +142,13 @@ public class tilemapSorter : NetworkBehaviour
                 _hit.transform.gameObject.GetComponent<SpriteRenderer>().enabled = false;
                 
 
+            }
+
+            if (Scan(mousePos, 1, 9) && canCollect)
+            {
+                Money += GetTilesInRadius(mousePos, 10, 0) * 100;
+                canCollect = false;
+                Debug.Log(GetTilesInRadius(mousePos, 10, 0));
             }
 
             WantHelp.SetActive(false);
@@ -199,6 +216,13 @@ public class tilemapSorter : NetworkBehaviour
             if (Money < 100 || ActiveTile == 0 || ActiveTile == 6)
                 return;
 
+            if (Money >= 10000 && ActiveTile == 9)
+            {
+                SendData(ActiveTile, mousePos, 0);
+                Money -= 10000;
+                Instantiate(MoneyCollectorTax, mousePos + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+                return;
+            }
 
             if (ActiveTile == 7) {
                 if (Scan(mousePos, 4, 1) == true && Money >= 300)
@@ -229,6 +253,14 @@ public class tilemapSorter : NetworkBehaviour
                 }
             }
 
+            if (ActiveTile == 10 && Money >= 200)
+            {
+                Money -= 200;
+                SendData(10, mousePos, 0);
+                Instantiate(glowstone, mousePos + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+                return;
+            }
+
             Money -= 100;
             
 
@@ -251,7 +283,7 @@ public class tilemapSorter : NetworkBehaviour
         {
             for (int i = -31; i < 32; i++)
             {
-                for (int l = 0; l < 9; l++)
+                for (int l = 0; l < 11; l++)
                 {
                     if (default1.GetTile(new Vector3Int(i, k, 0)) == tile[l])
                     {
@@ -295,6 +327,22 @@ public class tilemapSorter : NetworkBehaviour
         return Near;
     }
 
+    float GetTilesInRadius(Vector3Int Position, int Radius, int tileID)
+    {
+        float Blocks = 0;
+        for (int k = -Radius; k < Radius + 1; k++)
+        {
+            for (int i = -Radius; i < Radius + 1; i++)
+            {
+                if (default1.GetTile(Position + new Vector3Int(i, k, 0)) == tile[tileID])
+                {
+                    Blocks++;
+                }
+            }
+        }
+        return Blocks;
+    }
+
 
     bool CheckHaus(Vector3Int mousePos)
     {
@@ -335,7 +383,7 @@ public class tilemapSorter : NetworkBehaviour
         {
             for (int i = -31; i < 32; i++)
             {
-                for (int l = 0; l < 9; l++)
+                for (int l = 0; l < 11; l++)
                 {
                     if (default1.GetTile(new Vector3Int(i, k, 0)) == tile[l])
                     {
@@ -362,26 +410,6 @@ public class tilemapSorter : NetworkBehaviour
             }
         }
 
-    }
-
-    public static Vector3Int StringToVector3(string sVector)
-    {
-        // Remove the parentheses
-        if (sVector.StartsWith("(") && sVector.EndsWith(")"))
-        {
-            sVector = sVector.Substring(1, sVector.Length - 2);
-        }
-
-        // split the items
-        string[] sArray = sVector.Split(',');
-
-        // store as a Vector3
-        Vector3Int result = new Vector3Int(
-            int.Parse(sArray[0]),
-            int.Parse(sArray[1]),
-            int.Parse(sArray[2]));
-
-        return result;
     }
 
     [ClientRpc]
@@ -457,6 +485,16 @@ public class tilemapSorter : NetworkBehaviour
         {
             //Bomb
             ActiveTile = 8;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            //Manager
+            ActiveTile = 9;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            //glowstone, which is a entity not even a tile lol. (by entity i mean an instantiated gameobject)
+            ActiveTile = 10;
         }
         DisableAll();
         UITile[ActiveTile].SetActive(true);

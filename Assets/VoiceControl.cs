@@ -13,7 +13,7 @@ public class VoiceControl : NetworkBehaviour
     }
     void Update()
     {
-        VoiceTrans.SetActive(Input.GetKey(KeyCode.V));
+        //VoiceTrans.SetActive(Input.GetKey(KeyCode.V));
 
         if (Input.GetKeyDown(KeyCode.V)) {
             
