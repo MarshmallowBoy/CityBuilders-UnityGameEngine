@@ -6,11 +6,21 @@ using Mirror;
 public class VoiceControl : NetworkBehaviour
 {
     public GameObject VoiceTrans;
-    public string nickName = "%name%";
-    private void Start()
+
+    [SyncVar] public string nickName = "%name%";
+
+    public override void OnStartClient()
     {
-        nickName = PlayerPrefs.GetString("name");
+        SomeCommandFromClientToServer(PlayerPrefs.GetString("name"));
+        base.OnStartClient();
     }
+
+    [Command]
+    private void SomeCommandFromClientToServer(string data)
+    {
+        nickName = data;
+    }
+
     void Update()
     {
         //VoiceTrans.SetActive(Input.GetKey(KeyCode.V));

@@ -16,7 +16,7 @@ public class tilemapSorter : NetworkBehaviour
     public int ActiveTile;
     int lastActiveTile = 0;
     public Text UIMoney;
-    public float Money;
+    [SyncVar]public float Money;
     public float nextTimeToFire = 10f;
     int ExistingHaus = 0;
     public bool Eraser = false;
@@ -65,10 +65,18 @@ public class tilemapSorter : NetworkBehaviour
         
     }
 
+    [Command]
+    private void SomeCommandFromClientToServer(float data)
+    {
+        Money = data;
+    }
+
     void Update()
     {
         if (!isLocalPlayer)
             cam.gameObject.SetActive(false);
+
+        SomeCommandFromClientToServer(Money);
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0f)
         {
@@ -216,8 +224,11 @@ public class tilemapSorter : NetworkBehaviour
             if (Money < 100 || ActiveTile == 0 || ActiveTile == 6)
                 return;
 
-            if (Money >= 10000 && ActiveTile == 9)
+            if (ActiveTile == 9)
             {
+                if(Money < 10000){
+                    return;
+                }
                 SendData(ActiveTile, mousePos, 0);
                 Money -= 10000;
                 Instantiate(MoneyCollectorTax, mousePos + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
@@ -257,7 +268,8 @@ public class tilemapSorter : NetworkBehaviour
             {
                 Money -= 200;
                 SendData(10, mousePos, 0);
-                Instantiate(glowstone, mousePos + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+                GameObject temp = Instantiate(glowstone, mousePos + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+                NetworkServer.Spawn(temp);
                 return;
             }
 
@@ -394,6 +406,11 @@ public class tilemapSorter : NetworkBehaviour
                 sw.WriteLine(tileID);
             }
         }
+        foreach (var connection in NetworkServer.connections.Values)
+        {
+            sw.WriteLine(connection.identity.GetComponent<VoiceControl>().nickName);
+            sw.WriteLine(connection.identity.GetComponent<tilemapSorter>().Money);
+        }
     }
 
     [Command]
@@ -407,9 +424,39 @@ public class tilemapSorter : NetworkBehaviour
                 Vector3Int vect = new Vector3Int(i, k, 0);
                 tileID = int.Parse(sr.ReadLine());
                 rpcsend(vect, tileID);
+                switch (tileID)
+                {
+                    case 10:
+                        GameObject temp = Instantiate(glowstone, vect + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+                        NetworkServer.Spawn(temp);
+                        break;
+                    case 0:
+                        Instantiate(MoneyCollector, vect + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+                        Debug.Log(1);
+                        break;
+                    case 5:
+                        Instantiate(MoneyCollectorComp, vect + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+                        
+                        Debug.Log(5);
+                        break;
+                    case 9:
+                        Instantiate(MoneyCollectorTax, vect + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+                        Debug.Log(9);
+                        break;
+                }
             }
         }
-
+        foreach (var connection in NetworkServer.connections.Values)
+        {
+            string temp = sr.ReadLine();
+            foreach (var connection1 in NetworkServer.connections.Values)
+            {
+                if (temp == connection1.identity.GetComponent<VoiceControl>().nickName)
+                {
+                    connection1.identity.GetComponent<tilemapSorter>().Money = int.Parse(sr.ReadLine());
+                }
+            }
+        }
     }
 
     [ClientRpc]
