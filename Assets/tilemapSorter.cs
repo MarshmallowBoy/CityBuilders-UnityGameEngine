@@ -17,6 +17,8 @@ public class tilemapSorter : NetworkBehaviour
     int lastActiveTile = 0;
     public Text UIMoney;
     [SyncVar]public float Money;
+    public float Food;
+    [SyncVar] public float MaxFood;
     public float nextTimeToFire = 10f;
     int ExistingHaus = 0;
     public bool Eraser = false;
@@ -26,7 +28,7 @@ public class tilemapSorter : NetworkBehaviour
     public float ComplexCost;
     int ExistingComplex = 0;
     int tileID = 6;
-    int ExistingFarms = 0;
+    public int ExistingFarms = 0;
     bool canCollect = false;
 
     public GameObject cam2;
@@ -71,6 +73,19 @@ public class tilemapSorter : NetworkBehaviour
         Money = data;
     }
 
+    [Command]
+    public void CmdsetExistingFarms(int data)
+    {
+        ExistingFarms = data;
+        SetExistingFarmsToClient(data);
+    }
+
+    [ClientRpc]
+    void SetExistingFarmsToClient(int data)
+    {
+        ExistingFarms = data;
+    }
+
     void Update()
     {
         if (!isLocalPlayer)
@@ -107,6 +122,8 @@ public class tilemapSorter : NetworkBehaviour
             nextTimeToFire = Time.time + 10f;
             //Money += ExistingHaus * 100;
             //Money += ExistingComplex * 200;
+            RefreshFarms();
+            Food = ExistingFarms * 100;
             if(isServer || isServerOnly)
             Refresh();
         }
@@ -167,7 +184,7 @@ public class tilemapSorter : NetworkBehaviour
 
                 if (default1.GetTile(mousePos) == tile[0]) { ExistingHaus--; }
                 if (default1.GetTile(mousePos) == tile[5]) { ExistingComplex--; }
-                if (default1.GetTile(mousePos) == tile[7]) { ExistingFarms--; }
+                if (default1.GetTile(mousePos) == tile[7]) { CmdsetExistingFarms(ExistingFarms - 1); }
 
                 if (default1.GetTile(mousePos) != tile[6]) { Money += 100; }
                 SendData(6, mousePos, 0);
@@ -239,7 +256,7 @@ public class tilemapSorter : NetworkBehaviour
                 if (Scan(mousePos, 4, 1) == true && Money >= 300)
                 {
                     SendData(7, mousePos, 0);
-                    ExistingFarms++;
+                    RefreshFarms();
                     Money -= 300;
                     return;
                 }
@@ -301,9 +318,40 @@ public class tilemapSorter : NetworkBehaviour
                     {
                         tileID = l;
                     }
+                    
                 }
                 Vector3Int vect = new Vector3Int(i, k, 0);
                 rpcsend(vect, tileID);
+            }
+        }
+    }
+
+    [Command]
+    void RefreshFarms()
+    {
+        ExistingFarms = 0;
+        ExistingHaus = 0;
+        if (!isServer)
+        {
+            return;
+        }
+        for (int k = -24; k < 25; k++)
+        {
+            for (int i = -31; i < 32; i++)
+            {
+                for (int l = 0; l < 11; l++)
+                {
+                    if (default1.GetTile(new Vector3Int(i, k, 0)) == tile[l])
+                    {
+                        tileID = l;
+                    }
+
+                }
+                if (tileID == 7)
+                {
+                    ExistingFarms++;
+                    ExistingHaus++;
+                }
             }
         }
     }
@@ -416,6 +464,7 @@ public class tilemapSorter : NetworkBehaviour
     [Command]
     public void Load()
     {
+        ExistingFarms = 0;
         StreamReader sr = new StreamReader(Application.persistentDataPath + "/maps/save.cmf");
         for (int k = -24; k < 25; k++)
         {
@@ -443,9 +492,14 @@ public class tilemapSorter : NetworkBehaviour
                         Instantiate(MoneyCollectorTax, vect + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
                         Debug.Log(9);
                         break;
+                    case 7:
+                        ExistingFarms++;
+                        break;
+
                 }
             }
         }
+        CmdsetExistingFarms(ExistingFarms);
         foreach (var connection in NetworkServer.connections.Values)
         {
             string temp = sr.ReadLine();
@@ -475,6 +529,7 @@ public class tilemapSorter : NetworkBehaviour
         {
             //Haus
             ActiveTile = 0;
+            RefreshFarms();
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -527,6 +582,7 @@ public class tilemapSorter : NetworkBehaviour
         {
             //Farm
             ActiveTile = 7;
+            RefreshFarms();
         }
         if (Input.GetKeyDown(KeyCode.Alpha8))
         {

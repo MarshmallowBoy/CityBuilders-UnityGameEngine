@@ -39193,7 +39193,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 448396536}
-  - component: {fileID: 448396538}
+  - component: {fileID: 448396540}
   - component: {fileID: 448396537}
   - component: {fileID: 448396539}
   m_Layer: 0
@@ -39247,7 +39247,21 @@ MonoBehaviour:
   debugLog: 0
   statisticsGUI: 0
   statisticsLog: 0
---- !u!114 &448396538
+--- !u!114 &448396539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 448396535}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offsetX: 0
+  offsetY: 0
+--- !u!114 &448396540
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -39256,7 +39270,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 448396535}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8aab4c8111b7c411b9b92cf3dbc5bd4e, type: 3}
+  m_Script: {fileID: 11500000, guid: 7ddaa29622b49ef4985975715eb03028, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 1
@@ -39274,20 +39288,6 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs:
   - {fileID: 1368903030998156659, guid: 61797985ad1065a42a963195b8ccbfee, type: 3}
---- !u!114 &448396539
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 448396535}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  offsetX: 0
-  offsetY: 0
 --- !u!1 &476931346
 GameObject:
   m_ObjectHideFlags: 0
@@ -71868,7 +71868,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Ver.0.1.7
+  m_Text: Ver.0.1.8
 --- !u!222 &916769458
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -73309,7 +73309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76da8bef7be41444da251540d844342a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Manager1: {fileID: 448396538}
+  Manager1: {fileID: 0}
   Check: {fileID: 177404635}
   secretobject: {fileID: 922443504}
   LoadSign: {fileID: 0}

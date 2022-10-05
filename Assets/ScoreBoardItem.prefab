@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3770582771497503457}
   - component: {fileID: 8674597751096794809}
   - component: {fileID: 2179451596103490930}
+  - component: {fileID: 733206943959547985}
+  - component: {fileID: 3462219506531239535}
   m_Layer: 5
   m_Name: ScoreBoardItem
   m_TagString: Untagged
@@ -77,6 +79,36 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &733206943959547985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5680069952752308121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  visible: 0
+  m_AssetId: 2d74ded7459697f419bfe9d1b34bb817
+  hasSpawned: 0
+--- !u!114 &3462219506531239535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5680069952752308121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14a6921f9aa475a4dbc5b5be759e4713, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UsernameText: {fileID: 5039733338497737179}
 --- !u!1 &8135067315587566120
 GameObject:
   m_ObjectHideFlags: 0
