@@ -17,8 +17,8 @@ public class tilemapSorter : NetworkBehaviour
     int lastActiveTile = 0;
     public Text UIMoney;
     [SyncVar]public float Money;
-    public float Food;
-    [SyncVar] public float MaxFood;
+    public float Food = 0;
+    [SyncVar] public float MaxFood = 100;
     public float nextTimeToFire = 10f;
     int ExistingHaus = 0;
     public bool Eraser = false;
@@ -27,9 +27,12 @@ public class tilemapSorter : NetworkBehaviour
     public AudioSource Purchase;
     public float ComplexCost;
     int ExistingComplex = 0;
+    public int ExistingSilos = 0;
     int tileID = 6;
     public int ExistingFarms = 0;
     bool canCollect = false;
+
+    public GameObject FoodDisplay;
 
     public GameObject cam2;
 
@@ -123,15 +126,24 @@ public class tilemapSorter : NetworkBehaviour
             //Money += ExistingHaus * 100;
             //Money += ExistingComplex * 200;
             RefreshFarms();
-            Food = ExistingFarms * 100;
+            if (Food + (ExistingFarms * 100) >= MaxFood)
+            {
+                Food = MaxFood;
+            }
+            else
+            {
+                Food += ExistingFarms * 100;
+            }
+            MaxFood = ExistingSilos * 1000 + 100;
             if(isServer || isServerOnly)
             Refresh();
         }
+        FoodDisplay.GetComponent<Text>().text = Food.ToString() + "/" + MaxFood.ToString();
         Vector3Int mousePos = GetMousePos();
         CheckTileSelection();
         if (Input.GetMouseButtonDown(0))
         {
-            
+            RefreshFarms();
             RaycastHit2D _hit = Physics2D.Raycast(gameObject.GetComponentInChildren<Camera>().ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
             if (_hit.collider != null)
             {
@@ -218,9 +230,10 @@ public class tilemapSorter : NetworkBehaviour
             
 
             if (ActiveTile == 0)
-                if (CheckHaus(mousePos) == false || Money < HausCost || ExistingFarms/2 < ExistingHaus + 1) { return; } else {
+                if (CheckHaus(mousePos) == false || Money < HausCost || Food < 100) { return; } else {
                     ExistingHaus++;
                     Money -= HausCost;
+                    Food -= 100;
                     Purchase.PlayOneShot(Purchase.clip);
                     SendData(0, mousePos, 0);
                     Instantiate(MoneyCollector, mousePos + new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
@@ -266,6 +279,16 @@ public class tilemapSorter : NetworkBehaviour
                 }
             }
 
+            if (ActiveTile == 11)
+            {
+                if (Money >= 200)
+                {
+                    SendData(ActiveTile, mousePos, 0);
+                    RefreshFarms();
+                    Money -= 200;
+                }
+            }
+
             if (ActiveTile == 8)
             {
                 if (Money >= 300000)
@@ -294,6 +317,7 @@ public class tilemapSorter : NetworkBehaviour
             
 
             SendData(ActiveTile, mousePos, 0);
+            RefreshFarms();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -312,7 +336,7 @@ public class tilemapSorter : NetworkBehaviour
         {
             for (int i = -31; i < 32; i++)
             {
-                for (int l = 0; l < 11; l++)
+                for (int l = 0; l < 12; l++)
                 {
                     if (default1.GetTile(new Vector3Int(i, k, 0)) == tile[l])
                     {
@@ -331,6 +355,7 @@ public class tilemapSorter : NetworkBehaviour
     {
         ExistingFarms = 0;
         ExistingHaus = 0;
+        ExistingSilos = 0;
         if (!isServer)
         {
             return;
@@ -339,7 +364,7 @@ public class tilemapSorter : NetworkBehaviour
         {
             for (int i = -31; i < 32; i++)
             {
-                for (int l = 0; l < 11; l++)
+                for (int l = 0; l < 12; l++)
                 {
                     if (default1.GetTile(new Vector3Int(i, k, 0)) == tile[l])
                     {
@@ -350,7 +375,10 @@ public class tilemapSorter : NetworkBehaviour
                 if (tileID == 7)
                 {
                     ExistingFarms++;
-                    ExistingHaus++;
+                }
+                if (tileID == 11)
+                {
+                    ExistingSilos++;
                 }
             }
         }
@@ -443,7 +471,7 @@ public class tilemapSorter : NetworkBehaviour
         {
             for (int i = -31; i < 32; i++)
             {
-                for (int l = 0; l < 11; l++)
+                for (int l = 0; l < 12; l++)
                 {
                     if (default1.GetTile(new Vector3Int(i, k, 0)) == tile[l])
                     {
